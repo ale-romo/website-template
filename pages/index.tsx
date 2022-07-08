@@ -18,12 +18,8 @@ const QUERY = gql`
 }
 `;
 
-type Destination = {
-  name: string
-}
-
 export const getStaticProps: GetStaticProps = async () => {
-  const { destinations }: Destination[] = await graphcms.request(QUERY)
+  const { destinations } = await graphcms.request(QUERY)
 
 
   return {
@@ -52,7 +48,7 @@ const Home: NextPage = ({ destinations }: InferGetStaticPropsType<typeof getStat
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </Title>
           <ul>
-            {destinations.map(({ name }) => (
+            {destinations.map(({ name }: any ) => (
               <li key={name}>{name}</li>
             ))}
           </ul>
