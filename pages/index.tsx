@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { GraphQLClient, gql } from 'graphql-request';
 import styles from '../styles/Home.module.css'
 import styled from 'styled-components'
-import BasicLayout from "layout/Basic";
+import BasicLayout from 'layout/Basic';
+import Hero from 'components/Hero';
 
 const graphcms = new GraphQLClient(
   'https://api-us-west-2.graphcms.com/v2/cl3hm379u66tu01zdg2q9ermw/master'
@@ -43,6 +44,9 @@ const Home: NextPage = ({ destinations }: InferGetStaticPropsType<typeof getStat
       </Head>
 
       <main className={styles.main}>
+        <Hero backgroundImage='home_hero-bkg.png'>
+          Hero&apos;s content
+        </Hero>
         <BasicLayout>
           <Title className={styles.title}>
             Welcome to <a href="https://nextjs.org">Next.js!</a>
