@@ -2,6 +2,9 @@ import styled from 'styled-components';
 
 const StyledDiv = styled.div<Props>`
   background-image: url("${(props) => props.backgroundImage}");
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
   background-size: cover;
   padding: 40px 0 80px;
   width: 100%;
