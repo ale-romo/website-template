@@ -1,17 +1,24 @@
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState, cloneElement, ReactNode, FC, ReactElement } from 'react';
 import styled from 'styled-components';
 
 const CarouselViewport = styled.div`
   overflow: hidden;
 `
-const ItemCollection = styled.div<Props>`
+
+interface ItemCollectionProps {
+  activeIndex: number;
+}
+
+const ItemCollection = styled.div<ItemCollectionProps>`
   white-space: nowrap;
   transition: transform 0.3s;
   transform: translateX(-${props => props.activeIndex * 100}%);
 `
+interface StyledCarouselItemProps {
+  width: string;
+}
 
-const StyledCarouselItem = styled.div<Props>`
+const StyledCarouselItem = styled.div<StyledCarouselItemProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -21,8 +28,8 @@ const StyledCarouselItem = styled.div<Props>`
   width: ${(props) => props.width};
 `
 interface CarouselItemProps {
-  width: string;
   children: any;
+  width: string;
 }
 
 export const CarouselItem = ({ children, width }: CarouselItemProps) => {
@@ -32,28 +39,23 @@ export const CarouselItem = ({ children, width }: CarouselItemProps) => {
 }
 
 interface CarouselProps {
-  assets: string[];
+  children: ReactNode[];
 };
 
-const Carousel = ({ assets }: CarouselProps) => {
+const Carousel: FC<CarouselProps> = ({ children }): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState(0);
-
   const updateIndex = (newIndex: number) => {
     if (newIndex < 0) {
       newIndex = 0;
-    } else if (newIndex >= assets.length) {
-      newIndex = assets.length -1;
+    } else if (newIndex >= children.length) {
+      newIndex = children.length -1;
     }
     setActiveIndex(newIndex);
   }
-
+  if (!Array.isArray(children)) return cloneElement(children, { width: "100%"});
   return <CarouselViewport>
     <ItemCollection activeIndex={activeIndex}>
-      {assets.map(({ url }: any ) => (
-        <CarouselItem key={url} width="100%">
-          <Image src={url} width="400px" height="200px" alt={url} />
-        </CarouselItem>
-      ))}
+        {children.map((child) => cloneElement(child as ReactElement<any>, { width: "100%" }))};
     </ItemCollection>
     <button onClick={() => updateIndex(activeIndex -1)}>Prev</button>
     <button onClick={() => updateIndex(activeIndex +1)}>Next</button>

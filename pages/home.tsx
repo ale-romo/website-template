@@ -5,7 +5,7 @@ import Banner from 'components/Banner';
 import Hero from 'components/Hero';
 import Nav from 'components/Nav';
 import Concept from 'components/Concept';
-import Carousel from 'components/Carousel';
+import Carousel,  { CarouselItem } from 'components/Carousel';
 
 const graphcms = new GraphQLClient(
   'https://api-us-west-2.graphcms.com/v2/cl3hm379u66tu01zdg2q9ermw/master'
@@ -38,7 +38,11 @@ const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStatic
     <Nav />
   </Hero>
   <Concept />
-  <Carousel assets={assets} />
+  <Carousel>
+    {assets.map(({ url }: any, index: number) => <CarouselItem key={index} width="">
+      <Image src={url} width="400px" height="200px" alt={url} />
+    </CarouselItem>)}
+  </Carousel>
   </>
 }
 
