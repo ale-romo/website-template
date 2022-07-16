@@ -1,39 +1,63 @@
-import { useState, cloneElement, ReactNode, FC, ReactElement } from 'react';
+import { useState, useEffect, cloneElement, ReactNode, FC, ReactElement } from 'react';
 import styled from 'styled-components';
+import { useSwipeable } from 'react-swipeable';
 
 const CarouselViewport = styled.div`
   overflow: hidden;
-`
+  width: 100%;
+`;
 
 interface ItemCollectionProps {
   activeIndex: number;
-}
+};
 
 const ItemCollection = styled.div<ItemCollectionProps>`
   white-space: nowrap;
   transition: transform 0.3s;
   transform: translateX(-${props => props.activeIndex * 100}%);
-`
-interface StyledCarouselItemProps {
-  width: string;
-}
+  @media (max-width: 768px) {
+    transform: translateX(-${props => props.activeIndex * 80}%);
+  }
+`;
 
-const StyledCarouselItem = styled.div<StyledCarouselItemProps>`
+const StyledCarouselItem = styled.div`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 200px;
   background-color: green;
   color: #fff;
-  width: ${(props) => props.width};
+  width: 100%;
+`;
+
+interface StyledBulletProps {
+  isActive: boolean;
+  color: string;
+};
+
+const StyledBullet = styled.button<StyledBulletProps>`
+  border: solid 1px ${props => props.color};
+  background-color: ${props => props.isActive ? props.color : ''};
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
 `
+
+const StyledNavContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  column-gap: 15px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+`
+
 interface CarouselItemProps {
   children: any;
-  width: string;
-}
+};
 
-export const CarouselItem = ({ children, width }: CarouselItemProps) => {
-  return <StyledCarouselItem width={width}>
+export const CarouselItem = ({ children}: CarouselItemProps) => {
+  return <StyledCarouselItem>
     {children}
   </StyledCarouselItem>
 }
@@ -44,23 +68,60 @@ interface CarouselProps {
 
 const Carousel: FC<CarouselProps> = ({ children }): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const interval  = setInterval(() => {
+      if (!paused) {
+        updateIndex(activeIndex + 1);
+      }
+    }, 10000);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    }
+  });
+
   const updateIndex = (newIndex: number) => {
     if (newIndex < 0) {
-      newIndex = 0;
+      newIndex = children.length - 1;
     } else if (newIndex >= children.length) {
-      newIndex = children.length -1;
+      newIndex = 0;
     }
     setActiveIndex(newIndex);
-  }
-  if (!Array.isArray(children)) return cloneElement(children, { width: "100%"});
-  return <CarouselViewport>
-    <ItemCollection activeIndex={activeIndex}>
-        {children.map((child) => cloneElement(child as ReactElement<any>, { width: "100%" }))};
-    </ItemCollection>
-    <button onClick={() => updateIndex(activeIndex -1)}>Prev</button>
-    <button onClick={() => updateIndex(activeIndex +1)}>Next</button>
+  };
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => updateIndex(activeIndex -1),
+    onSwipedRight: () => updateIndex(activeIndex + 1)
+  });
+
+  if (!Array.isArray(children)) return cloneElement(children);
+  return <CarouselViewport
+    onMouseEnter={() => setPaused(true)}
+    onMouseLeave={() => setPaused(false)}
+    {...handlers}>
+    <>
+      <ItemCollection activeIndex={activeIndex}>
+          {children.map((child) => cloneElement(child as ReactElement<any>))};
+      </ItemCollection>
+      <StyledNavContainer>
+        <button onClick={() => updateIndex(activeIndex -1)}>Prev</button>
+          {children.map((child, index) => {
+              return <StyledBullet
+                key={index}
+                onClick={() => updateIndex(index)}
+                color="#FF006F"
+                isActive={index === activeIndex}
+                />
+            })
+          }
+        <button onClick={() => updateIndex(activeIndex +1)}>Next</button>
+      </StyledNavContainer>
+    </>
   </CarouselViewport>
-}
+};
 
 export default Carousel;
 
