@@ -25,13 +25,14 @@ const StickyPanel = ({children, yShow}: StickyPanelProps) => {
 
   useEffect(() => {
     const handleScroll = debounce(() => {
-      console.log('wtf')
       if (window.scrollY > yShow) {
-        setShowStickyPanel(true);
-      } else {
+        if (!showStickyPanel) {
+          setShowStickyPanel(true);
+        }
+      } else if(showStickyPanel) {
         setShowStickyPanel(false);
       }
-    }, 100);
+    }, 50);
 
     window.addEventListener('scroll', handleScroll);
 

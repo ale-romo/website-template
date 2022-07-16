@@ -1,4 +1,4 @@
-import type { NextPage, InferGetStaticPropsType, GetStaticProps } from 'next'
+import type { NextPage, InferGetStaticPropsType, GetStaticProps } from 'next';
 import { GraphQLClient, gql } from 'graphql-request';
 import Image from 'next/image';
 import Banner from 'components/Banner';
@@ -7,6 +7,8 @@ import Nav from 'components/Nav';
 import Concept from 'components/Concept';
 import Carousel,  { CarouselItem } from 'components/Carousel';
 import StickyPanel from 'components/StickyPanel';
+import BurgerMenu from 'components/BurgerMenu';
+import useWindowSize from 'utils/useWindowSize';
 
 const graphcms = new GraphQLClient(
   'https://api-us-west-2.graphcms.com/v2/cl3hm379u66tu01zdg2q9ermw/master'
@@ -32,13 +34,18 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const windowSize = useWindowSize();
+  const showBurger = windowSize.width < 768;
+
   return <>
   <Banner>Announcements go here</Banner>
   <Hero backgroundImage="home_hero-bkg.png">
     <Image src="/logo_large.svg" alt="Lúptiico - El valle en la palma de tu mano" width="300" height="442" />
     <Nav uncollapsed={true} />
-    <StickyPanel yShow={400}>
-      <Nav color="rgba(255, 95, 111, .7)" />
+    <StickyPanel yShow={100}>
+      <BurgerMenu showBurger={showBurger}>
+        <Nav color="rgba(255, 95, 111, .7)" />
+      </BurgerMenu>
     </StickyPanel>
   </Hero>
   <Concept />
