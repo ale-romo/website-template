@@ -1,5 +1,5 @@
 import { useState, useEffect, cloneElement, ReactNode, FC, ReactElement } from 'react';
-import styled from 'styled-components';
+import styled  from 'styled-components';
 import { useSwipeable } from 'react-swipeable';
 
 const CarouselViewport = styled.div`
@@ -11,14 +11,16 @@ interface ItemCollectionProps {
   activeIndex: number;
 };
 
-const ItemCollection = styled.div<ItemCollectionProps>`
+const ItemCollection = styled.div<ItemCollectionProps>(({
+  activeIndex,
+}) => `
   white-space: nowrap;
   transition: transform 0.3s;
-  transform: translateX(-${props => props.activeIndex * 100}%);
+  transform: translateX(-${activeIndex * 100}%);
   @media (max-width: 768px) {
-    transform: translateX(-${props => props.activeIndex * 80}%);
+    transform: translateX(-${activeIndex * 84}%)
   }
-`;
+`);
 
 const StyledCarouselItem = styled.div`
   display: inline-flex;
@@ -28,6 +30,13 @@ const StyledCarouselItem = styled.div`
   background-color: green;
   color: #fff;
   width: 100%;
+  @media (max-width: 768px) {
+    transform: scale3d(80%, 80%, 100%);
+    margin: 0 -8%;
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 `;
 
 interface StyledBulletProps {
@@ -35,13 +44,16 @@ interface StyledBulletProps {
   color: string;
 };
 
-const StyledBullet = styled.button<StyledBulletProps>`
-  border: solid 1px ${props => props.color};
-  background-color: ${props => props.isActive ? props.color : ''};
+const StyledBullet = styled.button<StyledBulletProps>(({
+  color,
+  isActive,
+}) =>`
+  border: solid 1px ${color};
+  background-color: ${isActive ? color : ''};
   width: 14px;
   height: 14px;
   border-radius: 7px;
-`
+`)
 
 const StyledNavContainer = styled.div`
   display: flex;
@@ -89,12 +101,13 @@ const Carousel: FC<CarouselProps> = ({ children }): JSX.Element => {
     } else if (newIndex >= children.length) {
       newIndex = 0;
     }
+
     setActiveIndex(newIndex);
   };
 
   const handlers = useSwipeable({
-    onSwipedLeft: () => updateIndex(activeIndex -1),
-    onSwipedRight: () => updateIndex(activeIndex + 1)
+    onSwipedLeft: () => updateIndex(activeIndex +1),
+    onSwipedRight: () => updateIndex(activeIndex -1)
   });
 
   if (!Array.isArray(children)) return cloneElement(children);
@@ -104,7 +117,7 @@ const Carousel: FC<CarouselProps> = ({ children }): JSX.Element => {
     {...handlers}>
     <>
       <ItemCollection activeIndex={activeIndex}>
-          {children.map((child) => cloneElement(child as ReactElement<any>))};
+          {children.map((child) => cloneElement(child as ReactElement<any>))}
       </ItemCollection>
       <StyledNavContainer>
         <button onClick={() => updateIndex(activeIndex -1)}>Prev</button>

@@ -1,11 +1,13 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 interface StyledButtonProps {
   active?: boolean;
 }
 
-const StyledButton = styled.button<StyledButtonProps>`
+const StyledButton = styled.button<StyledButtonProps>(({
+  active
+}) =>`
   width: 22px;
   height: 22px;
   padding: 0;
@@ -22,18 +24,18 @@ const StyledButton = styled.button<StyledButtonProps>`
     position: absolute;
     border-radius: 2px;
     background-color: black;
-    left: ${props => props.active ? '2px' : 0};
+    left: ${active ? '2px' : 0};
     transition: all .5s;
   }
   &:before {
-    top: ${props => props.active ? '9px' : '5px'};
-    transform: ${props => props.active ? 'rotate(45deg)' : 'initial'};
+    top: ${active ? '9px' : '5px'};
+    transform: ${active ? 'rotate(45deg)' : 'initial'};
   }
   &:after {
-    bottom: ${props => props.active ? '9px' : '5px'};
-    transform: ${props => props.active ? 'rotate(-45deg)' : 'initial'};
+    bottom: ${active ? '9px' : '5px'};
+    transform: ${active ? 'rotate(-45deg)' : 'initial'};
   }
-`
+`);
 
 
 interface StyledBurgerMenuProps {
@@ -42,7 +44,10 @@ interface StyledBurgerMenuProps {
   opened: boolean;
 }
 
-const StyledBurgerMenu = styled.div<StyledBurgerMenuProps>`
+const StyledBurgerMenu = styled.div<StyledBurgerMenuProps>(({
+  opened,
+  backgroundColor,
+}) => `
   display: block;
   position: fixed;
   overflow: scroll;
@@ -50,27 +55,37 @@ const StyledBurgerMenu = styled.div<StyledBurgerMenuProps>`
   height: 100%;
   z-index: 10;
   top: 0;
-  left: ${props => props.opened ? 0 : '-100%'};
-  background-color: ${props => props.backgroundColor ? props.backgroundColor : 'white'};
-  color: ${props => props.color ? props.color : 'black'};
-
-`;
+  transition: all .5s;
+  left: ${opened ? 0 : '-100%'};
+  background-color: ${backgroundColor || 'white'};
+`);
 
 interface BurgerMenuProps {
   children: ReactNode;
   showBurger: boolean;
+  backgroundColor?: string;
 }
 
-const BurgerMenu: FC<BurgerMenuProps> = ({children, showBurger}) => {
+const BurgerMenu: FC<BurgerMenuProps> = ({ children, showBurger, backgroundColor }) => {
   const [opened, setOpened] = useState(false);
 
   const toggleBurgerMenu = () => {
     setOpened(!opened)
   }
+
+    useEffect(()  => {
+      if(opened) {
+        document.body.style.overflow = "hidden";
+      }
+
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+  });
   if(showBurger) {
     return <>
     <StyledButton onClick={() => toggleBurgerMenu()} active={opened}/>
-    <StyledBurgerMenu opened={opened}>
+    <StyledBurgerMenu opened={opened} backgroundColor={backgroundColor}>
       {children}
     </StyledBurgerMenu>
   </>

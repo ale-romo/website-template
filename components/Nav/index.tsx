@@ -2,14 +2,14 @@ import Link from 'next/link';
 import styled from 'styled-components';
 
 interface NavProps {
-  uncollapsed?: boolean;
   color?: string;
   backgroundColor?: string;
+  direction?: 'row' | 'column'
 }
 const StyledList = styled.ul<NavProps>`
   display: flex;
   list-style: none;
-  flex-direction: row;
+  flex-direction: ${props => props.direction};
   align-content: space-around;
   flex-wrap: wrap;
   padding-left: 0;
@@ -34,8 +34,8 @@ const StyledList = styled.ul<NavProps>`
   }
 `;
 
-const Nav= ({ uncollapsed, color, backgroundColor }: NavProps)=> {
-  return <StyledList uncollapsed={uncollapsed} color={color} backgroundColor={backgroundColor}>
+const Nav= ({ color, backgroundColor, direction = 'row' }: NavProps)=> {
+  return <StyledList direction={direction} color={color} backgroundColor={backgroundColor}>
     <li><Link href="#concepto">Concepto</Link></li>
     <li><Link href="#habitaciones" scroll={true}>Habitaciones</Link></li>
     <li><Link href="#jardin">Jardin</Link></li>
