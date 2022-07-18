@@ -1,4 +1,4 @@
-import { useState, useEffect, cloneElement, ReactNode, FC, ReactElement } from 'react';
+import { useState, useEffect, cloneElement, ReactNode, FC, ReactElement, useRef } from 'react';
 import styled  from 'styled-components';
 import { useSwipeable } from 'react-swipeable';
 
@@ -117,22 +117,22 @@ export const CarouselItem = ({ children}: CarouselItemProps) => {
 interface CarouselProps {
   children: ReactNode[];
   color?: string;
+  interval?: number;
 };
 
-const Carousel: FC<CarouselProps> = ({ children, color }): JSX.Element => {
+const Carousel: FC<CarouselProps> = ({ children, color, interval }): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  console.log(color)
 
   useEffect(() => {
-    const interval  = setInterval(() => {
-      if (!paused) {
+    const autoplay  = setInterval(() => {
+      if (!paused && interval) {
         updateIndex(activeIndex + 1);
       }
-    }, 10000);
+    }, interval);
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (autoplay) {
+        clearInterval(autoplay);
       }
     }
   });

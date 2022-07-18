@@ -28,7 +28,7 @@ const StickyPanel = ({children}: StickyPanelProps) => {
   const [showStickyPanel, setShowStickyPanel] = useState(false);
   const [stick, setStick] = useState(false);
   const [yPos, setYpos] = useState(0)
-  const stickyRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (null !== stickyRef.current && !stick) {

@@ -53,7 +53,7 @@ const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStatic
       </Hero>
     </div>
     <Concept />
-    <Carousel color="#FF006F">
+    <Carousel color="#FF006F" interval={5000}>
       {assets.map(({ url, width, height }: any, index: number) => <CarouselItem key={index}>
         <Image src={url} width={width} height={height} alt={url} />
       </CarouselItem>)}
