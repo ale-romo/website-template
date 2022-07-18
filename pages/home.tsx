@@ -1,5 +1,4 @@
 import type { NextPage, InferGetStaticPropsType, GetStaticProps } from 'next';
-import { useRef, useLayoutEffect, useState } from 'react';
 import { GraphQLClient, gql } from 'graphql-request';
 import Image from 'next/image';
 import Banner from 'components/Banner';
@@ -18,7 +17,9 @@ const graphcms = new GraphQLClient(
 const QUERY = gql`
   {
     assets {
-    url
+      url
+      width
+      height
   }
 }
 `;
@@ -46,15 +47,15 @@ const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStatic
         <Nav />
         <StickyPanel>
           <BurgerMenu showBurger={showBurger}>
-            <Nav direction="column" color="rgba(255, 95, 111, .7)" />
+            <Nav direction={showBurger ? 'column' : 'row'} color="rgba(255, 95, 111, .7)" />
           </BurgerMenu>
         </StickyPanel>
       </Hero>
     </div>
     <Concept />
-    <Carousel>
-      {assets.map(({ url }: any, index: number) => <CarouselItem key={index}>
-        <Image src={url} width="400px" height="200px" alt={url} />
+    <Carousel color="#FF006F">
+      {assets.map(({ url, width, height }: any, index: number) => <CarouselItem key={index}>
+        <Image src={url} width={width} height={height} alt={url} />
       </CarouselItem>)}
     </Carousel>
   </>
