@@ -10,7 +10,7 @@ const StyledButton = styled.button<StyledButtonProps>(({
 }) =>`
   width: 22px;
   height: 22px;
-  padding: 0;
+  margin: 5px;
   display: block;
   position: relative;
   border: none;
