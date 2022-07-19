@@ -76,6 +76,9 @@ const StyledNavButton = styled.button<StyledNavButtonProps>(({
     height: 20px;
     width: 6px;
   }
+  @media (max-width: 768px) {
+    display: none;
+  }
 
 `);
 

@@ -46,7 +46,7 @@ const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStatic
         <Image src="/logo_large.svg" alt="Lúptiico - El valle en la palma de tu mano" width="300" height="442" />
         <Nav />
         <StickyPanel stickTo="top">
-          <BurgerMenu showBurger={showBurger}>
+          <BurgerMenu showBurger={showBurger} color="#FF006F">
             <Nav direction={showBurger ? 'column' : 'row'} color="rgba(255, 95, 111, .7)" />
           </BurgerMenu>
         </StickyPanel>
