@@ -1,54 +1,87 @@
-import { useState, useEffect, cloneElement, ReactNode, FC, ReactElement, useRef } from 'react';
-import styled  from 'styled-components';
+import { ReactNode, useState, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
+import styled from 'styled-components';
 
-const CarouselViewport = styled.div`
-  overflow: hidden;
+const StyledCarousel = styled.div`
   width: 100%;
+  overflow: hidden;
   position: relative;
 `;
 
-interface ItemCollectionProps {
+interface StyledCollectionProps {
   activeIndex: number;
-};
+  cardStyle: boolean;
+}
 
-const ItemCollection = styled.div<ItemCollectionProps>(({
+const StyledCollection = styled.div<StyledCollectionProps>(({
   activeIndex,
+  cardStyle,
 }) => `
-  white-space: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: stretch;
   transition: transform 0.3s;
   transform: translateX(-${activeIndex * 100}%);
-  @media (max-width: 768px) {
-    transform: translateX(-${activeIndex * 84}%)
+  @media (max-width:${cardStyle ? '768px' : 0}) {
+    transform: translateX(-${activeIndex * 85}%);
+    column-gap: 5%;
   }
 `);
 
-const StyledCarouselItem = styled.div`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
+interface StyledItemProps {
+  cardStyle: boolean;
+}
+
+const StyledItem = styled.div<StyledItemProps>(({
+  cardStyle,
+}) =>`
   width: 100%;
-  vertical-align: middle;
-  @media (max-width: 768px) {
-    transform: scale3d(80%, 80%, 100%);
-    margin: 0 -8%;
+  flex: 0 0 auto;
+  @media (max-width: ${cardStyle ? '768px' : 0}) {
+    width: 80%;
     &:first-child {
-      margin-left: 0;
+      margin-left: 10%;
     }
   }
-`;
+`);
+
+interface StyledNavProps {
+  display: 'left' | 'center'| 'right' | 0;
+  cardStyle: boolean;
+}
+
+const StyledNav = styled.div<StyledNavProps>(({
+  display,
+  cardStyle,
+}) =>  `
+  display: ${display ? 'flex' : 'none'};
+  flex-direction: row;
+  column-gap: 22px;
+  padding: 10px;
+  justify-content: ${display};
+  align-items: center;
+  @media (max-width: ${cardStyle ? '768px' : 0}) {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+`);
+
+interface StyledBulletProps {
+  isActive: boolean;
+  color: string;
+};
 
 interface StyledNavButtonProps {
   role: 'prev' | 'next';
   edge: boolean;
-  color?: string;
+  color: string;
 }
 
-const StyledNavButton = styled.button<StyledNavButtonProps>(({
+const StyledButton = styled.button<StyledNavButtonProps>(({
   role,
   edge,
-  color
+  color,
 }) => `
   border: none;
   background: none;
@@ -57,12 +90,12 @@ const StyledNavButton = styled.button<StyledNavButtonProps>(({
   height: 20px;
   position: absolute;
   top: 50%;
-  left: ${role === 'prev' ? '10px': 'auto'};
+  left: ${role === 'prev' ? '20px': 'auto'};
   right: ${role === 'next' ? '20px' : 'auto'};
-  transform: rotate(${role === 'prev' ? '-45deg' : '135deg'});
+  transform: translateY(calc(-50% - 18px)) rotate(${role === 'prev' ? '-45deg' : '135deg'});
   &:before, &:after {
     content: "";
-    background-color: ${color ? color : 'black'};
+    background-color: ${color};
     border-radius: 3px;
     position: absolute;
     top: 0;
@@ -82,50 +115,44 @@ const StyledNavButton = styled.button<StyledNavButtonProps>(({
 
 `);
 
-interface StyledBulletProps {
-  isActive: boolean;
-  color?: string;
-};
-
 const StyledBullet = styled.button<StyledBulletProps>(({
   color,
   isActive,
 }) =>`
-  border: solid 1px ${color ? color : 'black'};
-  background-color: ${isActive ? color ? color: 'black' : ''};
-  width: 14px;
-  height: 14px;
-  border-radius: 7px;
+  border: solid 1px ${color};
+  background-color: ${isActive ? color : 'transparent'};
+  width: 12px;
+  height: 12px;
+  transition: background-color 0.5s;
+  border-radius: 6px;
+  padding: 0;
 `)
 
-const StyledNavContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  column-gap: 15px;
-  padding: 10px;
-  justify-content: center;
-  align-items: center;
-`
-
-interface CarouselItemProps {
-  children: any;
-};
-
-export const CarouselItem = ({ children}: CarouselItemProps) => {
-  return <StyledCarouselItem>
-    {children}
-  </StyledCarouselItem>
+interface Props {
+  children: ReactNode[];
+  interval?: number;
+  color?: string;
+  cardStyle?: boolean;
+  navDisplay?: 'left' | 'center'| 'right' | 0;
 }
 
-interface CarouselProps {
-  children: ReactNode[];
-  color?: string;
-  interval?: number;
-};
+/**
+ * Flex Carousel
+ *
+ * @version 1.0.1
+ * @author [Ale Romo](https://github.com/ale-romo)
+ */
 
-const Carousel: FC<CarouselProps> = ({ children, color, interval }): JSX.Element => {
+const Carousel = ({
+  children,
+  interval = 0,
+  color = 'black',
+  cardStyle = true,
+  navDisplay = 'center',
+}: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const bullets: ReactNode[] = [];
 
   useEffect(() => {
     const autoplay  = setInterval(() => {
@@ -140,6 +167,7 @@ const Carousel: FC<CarouselProps> = ({ children, color, interval }): JSX.Element
     }
   });
 
+  // enabling carousel navigation
   const updateIndex = (newIndex: number) => {
     if (newIndex < 0) {
       newIndex = children.length - 1;
@@ -150,6 +178,7 @@ const Carousel: FC<CarouselProps> = ({ children, color, interval }): JSX.Element
     setActiveIndex(newIndex);
   };
 
+  // Adding Swiping capabilities for mobile
   const handlers = useSwipeable({
     onSwipedLeft: () => {
       if (activeIndex !== children.length - 1) {
@@ -163,40 +192,39 @@ const Carousel: FC<CarouselProps> = ({ children, color, interval }): JSX.Element
     }
   });
 
-  if (!Array.isArray(children)) return cloneElement(children);
-  return <CarouselViewport
+  return <StyledCarousel
     onMouseEnter={() => setPaused(true)}
     onMouseLeave={() => setPaused(false)}
-    {...handlers}>
-    <>
-      <ItemCollection activeIndex={activeIndex}>
-          {children.map((child) => cloneElement(child as ReactElement<any>))}
-      </ItemCollection>
-      <StyledNavButton
+    {...handlers}
+  >
+    <StyledCollection activeIndex={activeIndex} cardStyle={cardStyle}>
+      {children.map((child, index) => {
+        bullets.push(<StyledBullet
+          key={index}
+          isActive={index === activeIndex}
+          onClick={() => updateIndex(index)}
+          color={color}
+        />);
+        return <StyledItem key={index} cardStyle={cardStyle}>
+          {child}
+        </StyledItem>
+      })};
+    </StyledCollection>
+    <StyledButton
         onClick={() => updateIndex(activeIndex -1)}
         role="prev"
         edge={activeIndex === 0}
         color={color}
       />
-      <StyledNavContainer>
-        {children.map((child, index) => {
-            return <StyledBullet
-              key={index}
-              onClick={() => updateIndex(index)}
-              color={color}
-              isActive={index === activeIndex}
-              />
-          })
-        }
-      </StyledNavContainer>
-      <StyledNavButton
-        onClick={() => updateIndex(activeIndex +1)}
-        role="next" edge={activeIndex === children.length -1}
-        color={color}
-      />
-    </>
-  </CarouselViewport>
-};
+    <StyledNav display={navDisplay} cardStyle={cardStyle}>
+      {bullets}
+    </StyledNav>
+    <StyledButton
+      onClick={() => updateIndex(activeIndex +1)}
+      role="next" edge={activeIndex === children.length -1}
+      color={color}
+    />
+  </StyledCarousel>
+}
 
 export default Carousel;
-

@@ -1,14 +1,10 @@
 import type { NextPage, InferGetStaticPropsType, GetStaticProps } from 'next';
 import { GraphQLClient, gql } from 'graphql-request';
 import Image from 'next/image';
-import Banner from 'components/Banner';
-import Hero from 'components/Hero';
-import Nav from 'components/Nav';
-import Concept from 'components/Concept';
 import Carousel,  { CarouselItem } from 'components/Carousel';
-import StickyPanel from 'components/StickyPanel';
-import BurgerMenu from 'components/BurgerMenu';
-import useWindowSize from 'utils/useWindowSize';
+import Intro from 'lpFragments/Intro';
+
+
 
 const graphcms = new GraphQLClient(
   'https://api-us-west-2.graphcms.com/v2/cl3hm379u66tu01zdg2q9ermw/master'
@@ -27,7 +23,6 @@ const QUERY = gql`
 export const getStaticProps: GetStaticProps = async () => {
   const { assets } = await graphcms.request(QUERY)
 
-
   return {
     props: {
       assets: assets
@@ -36,28 +31,14 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const windowSize = useWindowSize();
-  const showBurger = windowSize.width < 768;
 
   return <>
-    <Banner>Próxima apertura</Banner>
-    <div>
-      <Hero backgroundImage="home_hero-bkg.png">
-        <Image src="/logo_large.svg" alt="Lúptiico - El valle en la palma de tu mano" width="300" height="442" />
-        <Nav />
-        <StickyPanel stickTo="top">
-          <BurgerMenu showBurger={showBurger} color="#FF006F">
-            <Nav direction={showBurger ? 'column' : 'row'} color="rgba(255, 95, 111, .7)" />
-          </BurgerMenu>
-        </StickyPanel>
-      </Hero>
-    </div>
-    <Concept />
-    <Carousel color="#FF006F" interval={5000}>
+    <Intro />
+    {/* <Carousel color="#FF006F" interval={5000}>
       {assets.map(({ url, width, height }: any, index: number) => <CarouselItem key={index}>
         <Image src={url} width={width} height={height} alt={url} />
       </CarouselItem>)}
-    </Carousel>
+    </Carousel> */}
   </>
 }
 
