@@ -1,8 +1,7 @@
 import type { NextPage, InferGetStaticPropsType, GetStaticProps } from 'next';
 import { GraphQLClient, gql } from 'graphql-request';
-import Image from 'next/image';
-import Carousel,  { CarouselItem } from 'components/Carousel';
 import Intro from 'lpFragments/Intro';
+import Cabins from 'lpFragments/Cabins';
 
 
 
@@ -34,6 +33,7 @@ const HomePage: NextPage = ({ assets }: InferGetStaticPropsType<typeof getStatic
 
   return <>
     <Intro />
+    <Cabins />
     {/* <Carousel color="#FF006F" interval={5000}>
       {assets.map(({ url, width, height }: any, index: number) => <CarouselItem key={index}>
         <Image src={url} width={width} height={height} alt={url} />

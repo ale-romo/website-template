@@ -41,7 +41,7 @@ const messages = [
 ]
 
 const StyledBanner = styled.section`
-  margin: -60px 0;
+  margin: -60px 0 0;
   padding: 0 5%;
   @media (max-width: 768px) {
     padding: 0;
